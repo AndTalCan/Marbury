@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_5.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kahoot — Marbury v. Madison</title>
 <style>
@@ -121,7 +121,13 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--kp);color
   <div class="white-card">
     <h2>¿Cuál es tu grupo?</h2>
     <p>Selecciona el número que te asignó el profesor. Cada grupo puede jugar <strong>una sola vez</strong>.</p>
-    <div class="group-grid" id="groupGrid"></div>
+    <div class="group-grid" id="groupGrid"><button class="gbtn" style="white-space: pre;">🔴
+Grupo 1</button><button class="gbtn" style="white-space: pre;">🔵
+Grupo 2</button><button class="gbtn" style="white-space: pre;">🟡
+Grupo 3</button><button class="gbtn" style="white-space: pre;">🟢
+Grupo 4</button><button class="gbtn" style="white-space: pre;">🟣
+Grupo 5</button><button class="gbtn" style="white-space: pre;">🟠
+Grupo 6</button></div>
     <div class="warn" id="warnTaken">⚠️ Ese grupo ya completó el quiz. No puede jugar de nuevo.</div>
     <button class="go-btn" id="goBtn" onclick="startGame()">¡Comenzar!</button>
   </div>
@@ -146,9 +152,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--kp);color
   </div>
   <div class="agrid" id="aGrid"></div>
   <div class="result" id="rOverlay">
-    <div class="rico" id="rIco"></div>
-    <div class="rlabel" id="rLbl"></div>
-    <div class="rscore-mini" id="rMini"></div>
+    <div style="font-size:48px">⏭️</div>
+    <div style="font-family:Montserrat,sans-serif;font-size:18px;font-weight:900;color:rgba(255,255,255,.7)">Respuesta registrada</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.45);max-width:280px;text-align:center;line-height:1.5">Las respuestas correctas se revelan cuando todos los grupos terminen.</div>
     <button class="rnext" id="rNext" onclick="nextQ()">Siguiente →</button>
   </div>
 </div>
@@ -390,7 +396,7 @@ function autoTimeout() {
 function markAnswers(cor, chosen) {
   document.querySelectorAll('.abtn').forEach((b, i) => {
     b.disabled = true;
-    b.classList.add(i === cor ? 'correct' : 'wrong');
+    b.style.opacity = '0.5';
   });
 }
 function showResult(ok) {
@@ -398,11 +404,6 @@ function showResult(ok) {
   document.getElementById('qArea').style.display = 'none';
   const ov = document.getElementById('rOverlay');
   ov.style.display = 'flex';
-  document.getElementById('rIco').textContent = ok ? '🎉' : '😬';
-  const lbl = document.getElementById('rLbl');
-  lbl.textContent = ok ? '¡Correcto!' : 'Incorrecto';
-  lbl.className = 'rlabel ' + (ok ? 'ok' : 'bad');
-  document.getElementById('rMini').textContent = 'Puntaje parcial: ' + myScore + ' / ' + (curQ + 1);
   document.getElementById('rNext').textContent = curQ >= TOTAL_Q - 1 ? 'Finalizar →' : 'Siguiente →';
 }
 
@@ -510,5 +511,6 @@ function show(id) {
 // ══ INIT ══
 buildGrid();
 </script>
-</body>
-</html>
+
+
+</body></html>
