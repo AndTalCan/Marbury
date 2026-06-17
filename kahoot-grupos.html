@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_7.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kahoot — Marbury v. Madison</title>
 <style>
@@ -121,7 +121,13 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--kp);color
   <div class="white-card">
     <h2>¿Cuál es tu grupo?</h2>
     <p>Selecciona el número que te asignó el profesor. Cada grupo puede jugar <strong>una sola vez</strong>.</p>
-    <div class="group-grid" id="groupGrid"></div>
+    <div class="group-grid" id="groupGrid"><button class="gbtn" style="white-space: pre;">🔴
+Grupo 1</button><button class="gbtn" style="white-space: pre;">🔵
+Grupo 2</button><button class="gbtn" style="white-space: pre;">🟡
+Grupo 3</button><button class="gbtn" style="white-space: pre;">🟢
+Grupo 4</button><button class="gbtn" style="white-space: pre;">🟣
+Grupo 5</button><button class="gbtn" style="white-space: pre;">🟠
+Grupo 6</button></div>
     <div class="warn" id="warnTaken">⚠️ Ese grupo ya completó el quiz. No puede jugar de nuevo.</div>
     <button class="go-btn" id="goBtn" onclick="startGame()">¡Comenzar!</button>
   </div>
@@ -177,7 +183,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--kp);color
 
 <script>
 // ══ CONFIG ══
-const FB = "https://kahoot-marbury-junio-default-rtdb.firebaseio.com";
+const JSONBIN_KEY = "%%JSONBIN_KEY%%";
+const JSONBIN_ID  = "%%JSONBIN_ID%%";
+const API = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
 const NUM_GROUPS = 6;
 const TOTAL_Q = 8;
 const TIMER_SECS = 120; // 2 minutes
@@ -187,9 +195,9 @@ const EMOJIS = ['🔴','🔵','🟡','🟢','🟣','🟠'];
 
 // ══ QUESTIONS ══
 // Section I: True/False (5 questions)
-// Section II: Match (3 questions - each asks which enunciado corresponds)
+// Section II: Match (3 questions)
 const QS = [
-  // ── TRUE / FALSE ──
+  // ── SECCIÓN I: VERDADERO / FALSO ──
   {
     type: "VERDADERO O FALSO",
     text: "Marbury y los demás jueces que no recibieron su nombramiento exigieron al Secretario de Estado, Madison, que se los entregara. Marbury realiza este pedido cuando Adams era presidente de los Estados Unidos.",
@@ -199,72 +207,73 @@ const QS = [
   },
   {
     type: "VERDADERO O FALSO",
-    text: "En el caso Marbury v. Madison no se ejerció el control de constitucionalidad de las leyes; la Corte Suprema consideró que no podía pronunciarse respecto a si una ley era o no contraria a la Constitución.",
+    text: "En el caso Marbury v. Madison no se ejerció el control de constitucionalidad de las leyes, incluso en este caso la Corte Suprema consideró que no podía pronunciarse respecto a si una ley era o no contraria a la Constitución.",
     opts: ["Verdadero", "Falso"],
     cor: 1,
-    exp: "FALSO. En Marbury v. Madison se establece precisamente el control de constitucionalidad (judicial review). La Corte SÍ se pronunció y declaró inconstitucional el §13 del Judiciary Act de 1789."
+    exp: "FALSO. En Marbury v. Madison SÍ se establece el control de constitucionalidad (judicial review). La Corte declaró inconstitucional el §13 del Judiciary Act de 1789."
   },
   {
     type: "VERDADERO O FALSO",
     text: "En el razonamiento de la Corte Suprema, la Constitución se sitúa al mismo nivel que las leyes ordinarias, y como toda ley, es modificable cuando así lo disponga el Legislativo.",
     opts: ["Verdadero", "Falso"],
     cor: 1,
-    exp: "FALSO. Marshall estableció la supremacía constitucional: la Constitución es la ley suprema del país, por encima de cualquier ley ordinaria. No puede modificarse por vía legislativa ordinaria."
+    exp: "FALSO. Marshall estableció la supremacía constitucional: la Constitución es la ley suprema, por encima de cualquier ley ordinaria. No puede modificarse por vía legislativa ordinaria."
   },
   {
     type: "VERDADERO O FALSO",
-    text: "La Corte Suprema consideró que sí era competente (en primera instancia o en apelación) para emitir el mandato solicitado por Marbury, y ordenó que Madison debía expedir y remitir los nombramientos.",
+    text: "La Corte Suprema considera que sí era competente sea en primera instancia o en apelación para emitir el mandato/mandamiento solicitado por Marbury. En consecuencia, la Corte ordena en su sentencia que Madison debe expedir y remitir los nombramientos solicitados por Marbury, otorgándole un plazo para ello.",
     opts: ["Verdadero", "Falso"],
     cor: 1,
-    exp: "FALSO. La Corte declaró que NO tenía competencia en primera instancia para emitir el mandato. La ley que se la otorgaba fue declarada inconstitucional y el pedido de Marbury fue rechazado."
+    exp: "FALSO. La Corte declaró que NO tenía competencia en primera instancia. La ley que se la otorgaba fue declarada inconstitucional y el pedido de Marbury fue rechazado."
   },
   {
     type: "VERDADERO O FALSO",
-    text: "Se dice que es muy posible que un descuido de Marshall cuando fue Secretario de Estado, o de su personal, podría haber sido la causa de que no se expidiese el nombramiento de Marbury en los últimos días del Gobierno de Adams.",
+    text: "Se dice que es muy posible que un descuido de Marshall cuando fue Secretario de Estado o de su personal podría haber sido la causa de que, con la premura de los últimos días del Gobierno de Adams, no se expidiese el nombramiento de Marbury.",
     opts: ["Verdadero", "Falso"],
     cor: 0,
-    exp: "VERDADERO. La ironía histórica del caso: Marshall, siendo Secretario de Estado saliente, no envió los nombramientos a tiempo, y luego fue el Chief Justice que resolvió el caso."
+    exp: "VERDADERO. La ironía histórica: Marshall, siendo Secretario de Estado saliente, no envió los nombramientos a tiempo y luego fue el Chief Justice que resolvió el caso."
   },
 
-  // ── SECTION II: MATCH ──
-  // Each question presents one "Pregunta del Tribunal" and asks which enunciado (a, b or c) le corresponde
+  // ── SECCIÓN II: RELACIONAR ──
+  // Una sola pregunta que muestra las 3 preguntas del Tribunal y pide relacionarlas
   {
     type: "RELACIONAR — Pregunta 1 del Tribunal",
-    text: "«¿Tiene el demandante derecho a que se le expida el nombramiento que reclama?»\n\n¿Cuál de los siguientes enunciados responde esta pregunta?",
+    text: "¿Tiene el demandante derecho a que se le expida el nombramiento que reclama?\n\n¿Cuál enunciado responde esta pregunta?",
     opts: [
-      "(a) Donde la Ley asigna una obligación específica al Secretario de Estado y los derechos individuales dependen de ella, los ciudadanos tienen derecho a recurrir a la justicia.",
-      "(b) La Corte Suprema no tiene competencia en primera instancia para ordenar el mandato. Toda Ley contraria a la Constitución es nula.",
-      "(c) El Sr. Marbury fue válidamente nombrado desde que el acta fue firmada por el Presidente y sellada por el Secretario de Estado. La negativa menoscaba un derecho legalmente adquirido.",
-      "(d) Madison actuó conforme a las instrucciones del Presidente Jefferson y no está obligado a entregar el nombramiento."
+      "(a) Donde la Ley asigna una obligación específica (como la asignada al Secretario de Estado) y los derechos individuales (como el de Marbury) dependen de la ejecución de tal obligación, los ciudadanos tienen un derecho a recurrir a las leyes del país para obtener una reparación. El Sr. Marbury es titular legal del cargo de Juez de Paz y tiene derecho a que se le entregue el nombramiento y para obtenerlo las leyes de este país sí le otorgan una acción en Justicia.",
+      "(b) Para evaluar si corresponde atender lo solicitado y ordenar el mandato requerido, dependerá de la reparación que Marbury haya solicitado y el poder que tenga la Corte. La Corte Suprema, conforme a la Constitución, no tiene competencia en primera instancia para ordenar el mandato solicitado por Marbury y, por ende, su pedido es rechazado. Toda Ley contraria a la Constitución es nula.",
+      "(c) El Sr. Marbury fue válidamente nombrado para el cargo desde el momento en que el acta de su nombramiento fue firmada por el Presidente y sellada por el Secretario de Estado. La negativa a notificar y expedir el acta de nombramiento es, por consiguiente, un acto que menoscaba un derecho legalmente adquirido.",
+      "(d) La Corte Suprema no tiene competencia para pronunciarse sobre actos discrecionales del Poder Ejecutivo, por lo que no puede analizar si Marbury tiene o no derecho al nombramiento."
     ],
-    cor: 2, // option (c)
-    exp: "Pregunta 1 → Enunciado (c): El Sr. Marbury fue válidamente nombrado desde que el acta fue firmada y sellada. La negativa de Madison menoscaba un derecho legalmente adquirido."
+    cor: 2,
+    exp: "Pregunta 1 → Enunciado (c): El Sr. Marbury fue válidamente nombrado desde que el acta fue firmada por el Presidente y sellada por el Secretario de Estado. La negativa menoscaba un derecho legalmente adquirido."
   },
   {
     type: "RELACIONAR — Pregunta 2 del Tribunal",
-    text: "«Si ese derecho hubiese sido menoscabado, ¿las leyes de este país le reconocen una vía o recurso para obtener satisfacción?»\n\n¿Cuál de los siguientes enunciados responde esta pregunta?",
+    text: "Si fuera así, y ese derecho hubiese sido menoscabado ¿las leyes de este país le reconocen una vía o recurso para obtener satisfacción?\n\n¿Cuál enunciado responde esta pregunta?",
     opts: [
-      "(a) Donde la Ley asigna una obligación específica al Secretario de Estado y los derechos individuales dependen de ella, los ciudadanos tienen derecho a recurrir a la justicia. El Sr. Marbury tiene derecho a que se le entregue el nombramiento.",
-      "(b) La Corte Suprema no tiene competencia en primera instancia para ordenar el mandato. Toda Ley contraria a la Constitución es nula.",
-      "(c) El Sr. Marbury fue válidamente nombrado desde que el acta fue firmada por el Presidente y sellada por el Secretario de Estado.",
-      "(d) El Secretario de Estado tiene discrecionalidad total en la entrega de nombramientos."
+      "(a) Donde la Ley asigna una obligación específica (como la asignada al Secretario de Estado) y los derechos individuales (como el de Marbury) dependen de la ejecución de tal obligación, los ciudadanos tienen un derecho a recurrir a las leyes del país para obtener una reparación. El Sr. Marbury es titular legal del cargo de Juez de Paz y tiene derecho a que se le entregue el nombramiento y para obtenerlo las leyes de este país sí le otorgan una acción en Justicia.",
+      "(b) Para evaluar si corresponde atender lo solicitado y ordenar el mandato requerido, dependerá de la reparación que Marbury haya solicitado y el poder que tenga la Corte. La Corte Suprema, conforme a la Constitución, no tiene competencia en primera instancia para ordenar el mandato solicitado por Marbury y, por ende, su pedido es rechazado. Toda Ley contraria a la Constitución es nula.",
+      "(c) El Sr. Marbury fue válidamente nombrado para el cargo desde el momento en que el acta de su nombramiento fue firmada por el Presidente y sellada por el Secretario de Estado. La negativa a notificar y expedir el acta de nombramiento es, por consiguiente, un acto que menoscaba un derecho legalmente adquirido.",
+      "(d) Las leyes del país no reconocen ningún recurso a Marbury porque el nombramiento no fue notificado formalmente antes del cambio de gobierno."
     ],
-    cor: 0, // option (a)
-    exp: "Pregunta 2 → Enunciado (a): Donde la Ley asigna una obligación específica y los derechos individuales dependen de ella, los ciudadanos tienen derecho a recurrir a la justicia."
+    cor: 0,
+    exp: "Pregunta 2 → Enunciado (a): Donde la Ley asigna una obligación específica y los derechos individuales dependen de ella, los ciudadanos tienen un derecho a recurrir a las leyes del país para obtener una reparación."
   },
   {
     type: "RELACIONAR — Pregunta 3 del Tribunal",
-    text: "«¿Esta vía de recurso prevé la posibilidad de que este Tribunal ordene un mandato como el solicitado?»\n\n¿Cuál de los siguientes enunciados responde esta pregunta?",
+    text: "Sí así fuera, ¿esta vía de recurso prevé la posibilidad de que este Tribunal ordene un mandato/mandamiento como el solicitado?\n\n¿Cuál enunciado responde esta pregunta?",
     opts: [
-      "(a) Donde la Ley asigna una obligación específica al Secretario de Estado y los derechos individuales dependen de ella, los ciudadanos tienen derecho a recurrir a la justicia.",
-      "(b) La Corte Suprema no tiene competencia en primera instancia para ordenar el mandato solicitado por Marbury. Toda Ley contraria a la Constitución es nula y debe ser declarada así.",
-      "(c) El Sr. Marbury fue válidamente nombrado desde que el acta fue firmada por el Presidente y sellada por el Secretario de Estado.",
-      "(d) El Congreso puede ampliar la competencia originaria de la Corte Suprema mediante ley ordinaria."
+      "(a) Donde la Ley asigna una obligación específica (como la asignada al Secretario de Estado) y los derechos individuales (como el de Marbury) dependen de la ejecución de tal obligación, los ciudadanos tienen un derecho a recurrir a las leyes del país para obtener una reparación. El Sr. Marbury es titular legal del cargo de Juez de Paz y tiene derecho a que se le entregue el nombramiento y para obtenerlo las leyes de este país sí le otorgan una acción en Justicia.",
+      "(b) Para evaluar si corresponde atender lo solicitado y ordenar el mandato requerido, dependerá de la reparación que Marbury haya solicitado y el poder que tenga la Corte. Como reparación, Marbury pretende que la Corte Suprema dicte un mandamiento para que Madison entregue el nombramiento de Marbury como Juez. Sin embargo, la Corte Suprema, conforme a la Constitución, no tiene competencia en primera instancia para ordenar el mandato solicitado por Marbury y, por ende, su pedido es rechazado. La regla que debe aplicarse es que toda Ley contraria a la Constitución es nula, y la Ley que nos otorga competencia debe ser declarada nula por ser contraria a la Constitución.",
+      "(c) El Sr. Marbury fue válidamente nombrado para el cargo desde el momento en que el acta de su nombramiento fue firmada por el Presidente y sellada por el Secretario de Estado. La negativa a notificar y expedir el acta de nombramiento es, por consiguiente, un acto que menoscaba un derecho legalmente adquirido.",
+      "(d) El Congreso puede ampliar la competencia originaria de la Corte Suprema mediante ley ordinaria, por lo que la Corte sí podría ordenar el mandato solicitado."
     ],
-    cor: 1, // option (b)
-    exp: "Pregunta 3 → Enunciado (b): La Corte no tiene competencia en primera instancia. La ley que se la otorgaba es inconstitucional y nula. El pedido de Marbury es rechazado."
+    cor: 1,
+    exp: "Pregunta 3 → Enunciado (b): La Corte no tiene competencia en primera instancia. Toda Ley contraria a la Constitución es nula. La Ley que otorgaba competencia a la Corte es inconstitucional y el pedido de Marbury es rechazado."
   }
 ];
+
 
 // ══ STATE ══
 let myGroup = null, curQ = 0, myScore = 0, myAnswers = [];
@@ -273,17 +282,17 @@ let timerInt = null, timeLeft = TIMER_SECS, didAnswer = false, pollInt = null;
 // ══ DB ══
 async function dbRead() {
   try {
-    const r = await fetch(FB + "/grupos.json");
-    
-    return (await r.json()) || {};
+    const r = await fetch(API + "/latest", { headers: { "X-Master-Key": JSONBIN_KEY } });
+    const j = await r.json();
+    return j.record || {};
   } catch(e) { return {}; }
 }
 async function dbWrite(data) {
   try {
-    await fetch(FB + "/grupos/g" + myGroup + ".json", {
+    await fetch(API, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ group: myGroup, score: myScore, total: TOTAL_Q, done: true, ts: Date.now() })
+      headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_KEY },
+      body: JSON.stringify(data)
     });
   } catch(e) {}
 }
@@ -503,5 +512,6 @@ function show(id) {
 // ══ INIT ══
 buildGrid();
 </script>
-</body>
-</html>
+
+
+</body></html>
