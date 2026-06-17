@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_7.html -->
+<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_8.html -->
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -107,6 +107,20 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--kp);color
 .aexp{color:rgba(255,255,255,.78)}
 
 .replay{background:rgba(255,255,255,.1);color:white;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 22px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;cursor:pointer;margin-top:.3rem}
+
+/* MATCH QUESTION - scrollable list */
+.match-container{display:flex;flex-direction:column;gap:8px;padding:.7rem .85rem;flex:1;overflow-y:auto}
+.match-opt{border:2px solid #C8A8FF;border-radius:10px;padding:10px 14px;font-family:"Nunito",sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:flex-start;gap:10px;color:#1A1035;background:white;text-align:left;line-height:1.5;transition:all .15s}
+.match-opt:hover:not(:disabled){background:#F0E8FF;border-color:#46178F}
+.match-opt:disabled{cursor:default}
+.match-opt .opt-letter{background:#46178F;color:white;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;margin-top:1px}
+.match-opt.selected-correct{background:#EAF3EE;border-color:#2E6B3E;color:#1A4D2B}
+.match-opt.selected-correct .opt-letter{background:#2E6B3E}
+.match-opt.selected-wrong{background:#FCEAEA;border-color:#8B1A1A;color:#5C1111}
+.match-opt.selected-wrong .opt-letter{background:#8B1A1A}
+.match-opt.reveal-correct{background:#EAF3EE;border-color:#2E6B3E;color:#1A4D2B;border-width:2.5px}
+.match-opt.reveal-correct .opt-letter{background:#2E6B3E}
+.match-opt.faded{opacity:.35}
 
 /* ALREADY PLAYED */
 .played-screen{align-items:center;justify-content:center;gap:1rem;padding:2rem;text-align:center}
@@ -340,19 +354,42 @@ function renderQ() {
   document.getElementById('qBox').textContent = q.text;
   document.getElementById('pFill').style.width = (curQ / TOTAL_Q * 100) + '%';
 
-  const grid = document.getElementById('aGrid');
-  // Section II questions (4 options) go single col if text is long
   const isMatch = q.type.startsWith('RELACIONAR');
-  grid.className = 'agrid' + (isMatch ? ' single-col' : '');
-  grid.style.display = 'grid'; grid.innerHTML = '';
+  const grid = document.getElementById('aGrid');
 
-  q.opts.forEach((o, i) => {
-    const b = document.createElement('button');
-    b.className = 'abtn ' + COLORS[i];
-    b.innerHTML = `<div class="aico">${ICONS[i]}</div><div class="atxt">${o}</div>`;
-    b.onclick = () => pick(i);
-    grid.appendChild(b);
-  });
+  if (isMatch) {
+    // Use match container with scrollable styled options
+    grid.style.display = 'none';
+    let mc = document.getElementById('matchContainer');
+    if (!mc) {
+      mc = document.createElement('div');
+      mc.id = 'matchContainer';
+      mc.className = 'match-container';
+      grid.parentNode.insertBefore(mc, grid.nextSibling);
+    }
+    mc.style.display = 'flex';
+    mc.innerHTML = '';
+    const letters = ['a','b','c','d'];
+    q.opts.forEach((o, i) => {
+      const b = document.createElement('button');
+      b.className = 'match-opt';
+      b.innerHTML = `<div class="opt-letter">${letters[i]}</div><div style="flex:1">${o}</div>`;
+      b.onclick = () => pick(i);
+      mc.appendChild(b);
+    });
+  } else {
+    let mc = document.getElementById('matchContainer');
+    if (mc) mc.style.display = 'none';
+    grid.className = 'agrid';
+    grid.style.display = 'grid'; grid.innerHTML = '';
+    q.opts.forEach((o, i) => {
+      const b = document.createElement('button');
+      b.className = 'abtn ' + COLORS[i];
+      b.innerHTML = `<div class="aico">${ICONS[i]}</div><div class="atxt">${o}</div>`;
+      b.onclick = () => pick(i);
+      grid.appendChild(b);
+    });
+  }
 
   document.getElementById('rOverlay').style.display = 'none';
   document.getElementById('qArea').style.display = 'block';
@@ -395,13 +432,22 @@ function autoTimeout() {
   setTimeout(() => showResult(false), 500);
 }
 function markAnswers(cor, chosen) {
-  document.querySelectorAll('.abtn').forEach((b, i) => {
-    b.disabled = true;
-    b.style.opacity = '0.5';
-  });
+  const q = QS[curQ];
+  if (q.type.startsWith('RELACIONAR')) {
+    document.querySelectorAll('.match-opt').forEach((b, i) => {
+      b.disabled = true;
+    });
+  } else {
+    document.querySelectorAll('.abtn').forEach((b, i) => {
+      b.disabled = true;
+      b.style.opacity = '0.5';
+    });
+  }
 }
 function showResult(ok) {
   document.getElementById('aGrid').style.display = 'none';
+  const mc = document.getElementById('matchContainer');
+  if (mc) mc.style.display = 'none';
   document.getElementById('qArea').style.display = 'none';
   const ov = document.getElementById('rOverlay');
   ov.style.display = 'flex';
@@ -417,7 +463,6 @@ async function nextQ() {
   } else {
     document.getElementById('rOverlay').style.display = 'none';
     document.getElementById('qArea').style.display = 'block';
-    document.getElementById('aGrid').style.display = 'grid';
     renderQ();
   }
 }
