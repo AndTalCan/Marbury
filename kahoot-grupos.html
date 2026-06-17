@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_5.html -->
-<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="es">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kahoot — Marbury v. Madison</title>
 <style>
@@ -121,13 +121,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--kp);color
   <div class="white-card">
     <h2>¿Cuál es tu grupo?</h2>
     <p>Selecciona el número que te asignó el profesor. Cada grupo puede jugar <strong>una sola vez</strong>.</p>
-    <div class="group-grid" id="groupGrid"><button class="gbtn" style="white-space: pre;">🔴
-Grupo 1</button><button class="gbtn" style="white-space: pre;">🔵
-Grupo 2</button><button class="gbtn" style="white-space: pre;">🟡
-Grupo 3</button><button class="gbtn" style="white-space: pre;">🟢
-Grupo 4</button><button class="gbtn" style="white-space: pre;">🟣
-Grupo 5</button><button class="gbtn" style="white-space: pre;">🟠
-Grupo 6</button></div>
+    <div class="group-grid" id="groupGrid"></div>
     <div class="warn" id="warnTaken">⚠️ Ese grupo ya completó el quiz. No puede jugar de nuevo.</div>
     <button class="go-btn" id="goBtn" onclick="startGame()">¡Comenzar!</button>
   </div>
@@ -183,9 +177,7 @@ Grupo 6</button></div>
 
 <script>
 // ══ CONFIG ══
-const JSONBIN_KEY = "%%JSONBIN_KEY%%";
-const JSONBIN_ID  = "%%JSONBIN_ID%%";
-const API = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
+const FB = "https://kahoot-marbury-junio-default-rtdb.firebaseio.com";
 const NUM_GROUPS = 6;
 const TOTAL_Q = 8;
 const TIMER_SECS = 120; // 2 minutes
@@ -281,17 +273,17 @@ let timerInt = null, timeLeft = TIMER_SECS, didAnswer = false, pollInt = null;
 // ══ DB ══
 async function dbRead() {
   try {
-    const r = await fetch(API + "/latest", { headers: { "X-Master-Key": JSONBIN_KEY } });
-    const j = await r.json();
-    return j.record || {};
+    const r = await fetch(FB + "/grupos.json");
+    
+    return (await r.json()) || {};
   } catch(e) { return {}; }
 }
 async function dbWrite(data) {
   try {
-    await fetch(API, {
+    await fetch(FB + "/grupos/g" + myGroup + ".json", {
       method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_KEY },
-      body: JSON.stringify(data)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ group: myGroup, score: myScore, total: TOTAL_Q, done: true, ts: Date.now() })
     });
   } catch(e) {}
 }
@@ -511,6 +503,5 @@ function show(id) {
 // ══ INIT ══
 buildGrid();
 </script>
-
-
-</body></html>
+</body>
+</html>
