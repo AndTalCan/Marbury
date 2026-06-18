@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_9.html -->
+<!-- saved from url=(0059)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_10.html -->
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -458,15 +458,13 @@ async function nextQ() {
 
 // ══ SAVE ══
 async function saveScore() {
-  const data = await dbRead();
-  data['g' + myGroup] = {
-    group: myGroup,
-    score: myScore,
-    total: TOTAL_Q,
-    done: true,
-    ts: Date.now()
-  };
-  await dbWrite(data);
+  try {
+    await fetch("https://kahoot-marbury-junio-default-rtdb.firebaseio.com/grupos/g" + myGroup + ".json", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ group: myGroup, score: myScore, total: TOTAL_Q, done: true, ts: Date.now() })
+    });
+  } catch(e) { console.error("saveScore error:", e); }
 }
 
 // ══ WAIT ══
