@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_8.html -->
+<!-- saved from url=(0058)file:///C:/Users/talavera_a/Downloads/kahoot-grupos_9.html -->
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -197,9 +197,7 @@ Grupo 6</button></div>
 
 <script>
 // ══ CONFIG ══
-const JSONBIN_KEY = "%%JSONBIN_KEY%%";
-const JSONBIN_ID  = "%%JSONBIN_ID%%";
-const API = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
+const FB = "https://kahoot-marbury-junio-default-rtdb.firebaseio.com";
 const NUM_GROUPS = 6;
 const TOTAL_Q = 8;
 const TIMER_SECS = 120; // 2 minutes
@@ -296,20 +294,11 @@ let timerInt = null, timeLeft = TIMER_SECS, didAnswer = false, pollInt = null;
 // ══ DB ══
 async function dbRead() {
   try {
-    const r = await fetch(API + "/latest", { headers: { "X-Master-Key": JSONBIN_KEY } });
-    const j = await r.json();
-    return j.record || {};
+    const r = await fetch(FB + "/grupos.json");
+    return (await r.json()) || {};
   } catch(e) { return {}; }
 }
-async function dbWrite(data) {
-  try {
-    await fetch(API, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_KEY },
-      body: JSON.stringify(data)
-    });
-  } catch(e) {}
-}
+// dbWrite not used - saveScore handles writes directly
 
 // ══ ENTRY ══
 async function buildGrid() {
